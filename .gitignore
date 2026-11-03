@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# Local configuration
+.env
+.env.*
+!.env.example
+
+# Test 
+test-results/
+playwright-report/
+
+# macOS
+.DS_Store
