@@ -36,12 +36,19 @@ For each quote, identify its source field or attachment name.
 Do not cite file contents that were not supplied.
 A file path is only a reference, not evidence that you read the file.
 
-If evidence is insufficient, state that explicitly and list
-the missing information. Use category "unknown" when appropriate.
-
 Suggest concrete next checks.
 Do not recommend weakening assertions, skipping tests, or increasing
 timeouts without evidence that those changes are justified.
+
+Use category "unknown" when the available evidence does not distinguish
+between plausible causes. State in likely_cause that the cause could not
+be determined from the report. List the missing evidence and suggest a
+concrete check that would help distinguish the plausible causes.
+
+A locator assertion timeout shows only that the expected element was not
+found or did not become visible in time. Use "ui_locator" only when
+additional evidence points to a locator mismatch. If the timeout is the
+only diagnostic evidence, use "unknown".
 
 Return only the JSON object required by the output schema.
 """,
