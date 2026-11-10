@@ -4,6 +4,8 @@ import sys
 EXPECTED_CATEGORIES = {
     "catalog displays products": "api_error",
     "catalog fails with an incorrect products locator": "ui_locator",
+    "catalog product list is not visible": "unknown",
+    "catalog locator fails after an unrelated telemetry error": "ui_locator",
 }
 
 

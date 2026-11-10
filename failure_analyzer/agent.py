@@ -50,6 +50,23 @@ found or did not become visible in time. Use "ui_locator" only when
 additional evidence points to a locator mismatch. If the timeout is the
 only diagnostic evidence, use "unknown".
 
+Prioritize evidence that directly explains the failed assertion.
+Treat an HTTP error as a candidate cause only when the evidence links
+the request to the behavior under test. Temporal proximity alone
+does not establish that link.
+
+If the report confirms that the intended UI element was visible and
+the failing locator uses a different exact accessible name, classify
+the failure as ui_locator unless concrete evidence contradicts that
+diagnosis. If the report contains only a locator timeout and no
+evidence explaining it, use unknown.
+
+Before returning the JSON, verify that category matches the best-supported
+diagnosis in likely_cause. If likely_cause identifies an incorrect exact
+accessible name in the locator as the most likely explanation and cites
+evidence for the mismatch, set category to ui_locator. Use unknown when
+the available evidence is insufficient to favor a specific category.
+
 Return only the JSON object required by the output schema.
 """,
         output_schema=FailureAnalysis,
