@@ -1,0 +1,67 @@
+
+name: Playwright Failure Analysis
+
+on:
+  workflow_dispatch:
+
+jobs:
+  failure-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r backend/requirements.txt
+          python -m pip install -r failure_analyzer/requirements.txt
+
+      - name: Install Playwright dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Run sample Playwright failures
+        run: |
+          mkdir -p failure-results
+          npx playwright test -c playwright.failure.config.ts || true
+
+      - name: Verify Playwright JSON exists
+        run: test -s failure-results/results.json
+
+      - name: Analyze failures
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m failure_analyzer.analyze \
+            failure-results/results.json \
+            > failure-results/analysis.json
+
+      - name: Validate failure categories
+        run: |
+          python -m failure_analyzer.check_categories \
+            < failure-results/analysis.json
+
+      - name: Upload analysis artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-analysis
+          path: failure-results/
+          if-no-files-found: warn
