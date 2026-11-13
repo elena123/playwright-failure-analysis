@@ -54,9 +54,28 @@ jobs:
             > failure-results/analysis.json
 
       - name: Validate failure categories
+        id: validation
+        continue-on-error: true
         run: |
           python -m failure_analyzer.check_categories \
-            < failure-results/analysis.json
+            < failure-results/analysis.json \
+            > failure-results/category-validation.txt 2>&1
+
+          cat failure-results/category-validation.txt
+
+      - name: Write validation summary
+        if: always()
+        run: |
+          echo "## AI Failure Analysis Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Validation outcome: ${{ steps.validation.outcome }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f failure-results/category-validation.txt ]; then
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            cat failure-results/category-validation.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload analysis artifacts
         if: always()
